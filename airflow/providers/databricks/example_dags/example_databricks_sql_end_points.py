@@ -52,16 +52,16 @@ with DAG(
     json = {
         "name": "New SQL Endpoint",
         "cluster_size" : "2X-Small",
-        "min_num_clusters" : 1,
+        "min_num_clusters": 1,
         "max_num_clusters": 1,
-        "auto_stop_mins" : 10,
-        "tags" : [],
+        "auto_stop_mins": 10,
+        "tags": [],
         "spot_instance_policy": "COST_OPTIMIZED",
-        "enable_photon" : False,
+        "enable_photon": False,
         "enable_serverless_compute": False,
-        "channel" : "CHANNEL_NAME_CURRENT"
+        "channel": "CHANNEL_NAME_CURRENT"
     }
 
-    task2 = DatabricksCreateSqlEndpointOperator(task_id='create_sql_end_points', json)
+    task2 = DatabricksCreateSqlEndpointOperator(task_id='create_sql_end_points', json=json)
     #print(task2.execute())
     task1 >> task2
