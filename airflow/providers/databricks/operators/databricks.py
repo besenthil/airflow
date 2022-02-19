@@ -680,4 +680,5 @@ class DatabricksGetSqlEndpointOperator(BaseOperator):
 
     def execute(self, context: 'Context'):
         hook = self._get_hook()
+        context = None
         return hook.get_sql_endpoints()
