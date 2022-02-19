@@ -60,6 +60,7 @@ RUN_LIFE_CYCLE_STATES = ['PENDING', 'RUNNING', 'TERMINATING', 'TERMINATED', 'SKI
 SQL_ENDPOINT_LIFE_CYCLE_STATES = ['STARTING', 'RUNNING', 'STOPPING', 'STOPPED', 'DELETING', 'DELETED']
 
 CREATE_SQL_ENDPOINT = ("POST", "api/2.0/sql/endpoints/create")
+GET_SQL_ENDPOINTS = ("GET", "api/2.0/sql/endpoints")
 GET_SQL_ENDPOINT_STATE = ("GET", "api/2.0/sql/endpoints/{}")
 
 # https://docs.microsoft.com/en-us/azure/databricks/dev-tools/api/latest/aad/service-prin-aad-token#--get-an-azure-active-directory-access-token
@@ -598,13 +599,32 @@ class DatabricksHook(BaseHook):
         a string describing state, or ``get_run_state_lifecycle``, ``get_run_state_result``, or
         ``get_run_state_message`` to get individual components of the run state.
 
-        :param run_id: id of the run
-        :return: state of the run
+        :param sql_end_point_id: id of the sql_end_point
+        :return: state of the sql_end_point
         """
 
         response = self._do_api_call(GET_SQL_ENDPOINT_STATE, None)
         state = response['state']
         return SQLEndpointState(**state)
+
+    def get_sql_endpoints(self):
+        """
+        Gets the list of SQL Endpoints.
+
+        Please note that any Airflow tasks that call the ``get_run_state`` method will result in
+        failure unless you have enabled xcom pickling.  This can be done using the following
+        environment variable: ``AIRFLOW__CORE__ENABLE_XCOM_PICKLING``
+
+        If you do not want to enable xcom pickling, use the ``get_run_state_str`` method to get
+        a string describing state, or ``get_run_state_lifecycle``, ``get_run_state_result``, or
+        ``get_run_state_message`` to get individual components of the run state.
+
+        :param run_id: id of the run
+        :return: state of the run
+        """
+
+        response = self._do_api_call(GET_SQL_ENDPOINTS, None)
+        return response['endpoints']
 
 
 def _retryable_error(exception) -> bool:

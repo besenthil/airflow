@@ -654,3 +654,30 @@ class DatabricksCreateSqlEndpointOperator(BaseOperator):
         hook = self._get_hook()
         self.sql_endpoint_id = hook.create_sql_endpoint(self.json)
         return self.sql_endpoint_id
+
+
+class DatabricksGetSqlEndpointOperator(BaseOperator):
+    # Used in airflow.models.BaseOperator
+    template_fields: Sequence[str] = ('json',)
+    # Databricks brand color (blue) under white text
+    ui_color = '#1CB1C2'
+    ui_fgcolor = '#fff'
+
+    def __init__(
+        self,
+        *,
+        databricks_conn_id: str = 'databricks_default',
+        **kwargs,
+    ) -> None:
+        """Creates a new ``DatabricksCreateSqlEndpointOperator``."""
+        super().__init__(**kwargs)
+        self.databricks_conn_id = databricks_conn_id
+
+    def _get_hook(self) -> DatabricksHook:
+        return DatabricksHook(
+            self.databricks_conn_id
+        )
+
+    def execute(self, context: 'Context'):
+        hook = self._get_hook()
+        return hook.get_sql_endpoints()
