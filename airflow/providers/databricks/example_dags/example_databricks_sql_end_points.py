@@ -51,7 +51,7 @@ with DAG(
 
     json = {
         "name": "New SQL Endpoint",
-        "cluster_size" : "2X-Small",
+        "cluster_size": "2X-Small",
         "min_num_clusters": 1,
         "max_num_clusters": 1,
         "auto_stop_mins": 10,
