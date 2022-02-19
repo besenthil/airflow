@@ -572,8 +572,8 @@ class DatabricksSQLEndpointSpotInstancePolicy(Enum):
     COST_OPTIMIZED is the default policy.
     .. see also:: https://docs.databricks.com/sql/api/sql-endpoints.html#endpointspotinstancepolicy
     """
-    COST_OPTIMIZED = 'COST_OPTIMIZED'
-    RELIABILITY_OPTIMIZED = 'RELIABILITY_OPTIMIZED'
+    COST_OPTIMIZED: str = 'COST_OPTIMIZED'
+    RELIABILITY_OPTIMIZED: str = 'RELIABILITY_OPTIMIZED'
 
 
 class DatabricksSQLEndpointChannelName(Enum):
@@ -582,8 +582,8 @@ class DatabricksSQLEndpointChannelName(Enum):
     set to the current channel
     .. see also:: https://docs.databricks.com/sql/api/sql-endpoints.html#channel
     """
-    CHANNEL_NAME_PREVIEW = 'CHANNEL_NAME_PREVIEW'
-    CHANNEL_NAME_CURRENT = 'CHANNEL_NAME_CURRENT'
+    CHANNEL_NAME_PREVIEW: str = 'CHANNEL_NAME_PREVIEW'
+    CHANNEL_NAME_CURRENT: str = 'CHANNEL_NAME_CURRENT'
 
 
 class DatabricksCreateSqlEndpointOperator(BaseOperator):
@@ -603,10 +603,10 @@ class DatabricksCreateSqlEndpointOperator(BaseOperator):
         max_num_clusters: int = 1,
         auto_stop_mins: int = 0,
         tags: Optional[Dict[str, str]] = None,
-        spot_instance_policy: Optional[DatabricksSQLEndpointSpotInstancePolicy] = None,
+        spot_instance_policy: str = None,
         enable_photon: bool = True,
         enable_serverless_compute: bool = False,
-        channel: Optional[DatabricksSQLEndpointChannelName] = None,
+        channel: str = None,
         databricks_conn_id: str = 'databricks_default',
         databricks_retry_limit: int = 3,
         databricks_retry_delay: int = 1,
