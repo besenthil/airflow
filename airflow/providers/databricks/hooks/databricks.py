@@ -192,6 +192,7 @@ class DatabricksHook(BaseHook):
 
     @cached_property
     def databricks_conn(self) -> Connection:
+        print(self.databricks_conn_id)
         return self.get_connection(self.databricks_conn_id)
 
     @staticmethod
