@@ -650,7 +650,7 @@ class DatabricksCreateSqlEndpointOperator(BaseOperator):
             retry_delay=self.databricks_retry_delay,
         )
 
-    def execute(self, context: 'Context'):
+    def execute(self, context: 'Context' = None):
         hook = self._get_hook()
         self.sql_endpoint_id = hook.create_sql_endpoint(self.json)
         return self.sql_endpoint_id
