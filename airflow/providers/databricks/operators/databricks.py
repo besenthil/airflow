@@ -598,7 +598,7 @@ class DatabricksCreateSqlEndpointOperator(BaseOperator):
         *,
         json: Optional[Any] = None,
         name: str = 'My SQL Endpoint',
-        cluster_size: str,
+        cluster_size: str = None,
         min_num_clusters: int = 1,
         max_num_clusters: int = 1,
         auto_stop_mins: int = 0,
