@@ -554,15 +554,15 @@ class DatabricksSQLEndpointClusterSize(Enum):
     The cluster size indicates the size of the SQL endpoint cluster
     .. see also:: https://docs.databricks.com/sql/admin/sql-endpoints.html#cluster-size
     """
-    TWO_X_SMALL = '2X-Small'
-    X_SMALL = 'X-Small'
-    SMALL = 'Small'
-    MEDIUM = 'Medium'
-    LARGE = 'Large'
-    X_LARGE = 'X-large'
-    TWO_X_LARGE = '2X-Large'
-    THREE_X_LARGE = '3X-Large'
-    FOUR_X_LARGE = '4X-Large'
+    TWO_X_SMALL: str = '2X-Small'
+    X_SMALL: str = 'X-Small'
+    SMALL: str = 'Small'
+    MEDIUM: str = 'Medium'
+    LARGE: str = 'Large'
+    X_LARGE: str = 'X-large'
+    TWO_X_LARGE: str = '2X-Large'
+    THREE_X_LARGE: str = '3X-Large'
+    FOUR_X_LARGE: str = '4X-Large'
 
 
 class DatabricksSQLEndpointSpotInstancePolicy(Enum):
