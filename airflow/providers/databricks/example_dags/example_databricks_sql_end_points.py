@@ -46,9 +46,6 @@ with DAG(
 ) as dag:
     import os
     # databricks_connection = os.environ["AIRFLOW_CONN_DATABRICKS_DEFAULT"]
-    task1 = DatabricksGetSqlEndpointsOperator(task_id='get_sql_end_points',)
-    print(task1.execute())
-
     json = {
         "name": "New SQL Endpoint",
         "cluster_size": "2X-Small",
@@ -65,3 +62,5 @@ with DAG(
     task2 = DatabricksCreateSqlEndpointOperator(task_id='create_sql_end_points', json=json)
     print(task2.execute())
     #task1 >> task2
+    task1 = DatabricksGetSqlEndpointsOperator(task_id='get_sql_end_points', )
+    print(task1.execute())
