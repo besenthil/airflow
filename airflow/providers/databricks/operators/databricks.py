@@ -678,7 +678,7 @@ class DatabricksGetSqlEndpointOperator(BaseOperator):
             self.databricks_conn_id
         )
 
-    def execute(self, context: 'Context'):
+    def execute(self, context: 'Context' = None):
         hook = self._get_hook()
         context = None
         return hook.get_sql_endpoints()
