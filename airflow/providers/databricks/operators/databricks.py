@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Sequence, Union
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.providers.databricks.hooks.databricks import DatabricksHook
+from enum import Enum
 
 if TYPE_CHECKING:
     from airflow.utils.context import Context
@@ -546,3 +547,110 @@ class DatabricksRunNowOperator(BaseOperator):
             )
         else:
             self.log.error('Error: Task: %s with invalid run_id was requested to be cancelled.', self.task_id)
+
+
+class DatabricksSQLEndpointClusterSize(Enum):
+    """
+    The cluster size indicates the size of the SQL endpoint cluster
+    .. see also:: https://docs.databricks.com/sql/admin/sql-endpoints.html#cluster-size
+    """
+    TWO_X_SMALL = '2X-Small'
+    X_SMALL = 'X-Small'
+    SMALL = 'Small'
+    MEDIUM = 'Medium'
+    LARGE = 'Large'
+    X_LARGE = 'X-large'
+    TWO_X_LARGE = '2X-Large'
+    THREE_X_LARGE = '3X-Large'
+    FOUR_X_LARGE = '4X-Large'
+
+
+class DatabricksSQLEndpointSpotInstancePolicy(Enum):
+    """
+    The spot instance policy indicates the Use of an on-demand instance for the cluster driver
+    and spot instances for cluster executors. The maximum spot price is 100% of the on-demand price.
+    COST_OPTIMIZED is the default policy.
+    .. see also:: https://docs.databricks.com/sql/api/sql-endpoints.html#endpointspotinstancepolicy
+    """
+    COST_OPTIMIZED = 'COST_OPTIMIZED'
+    RELIABILITY_OPTIMIZED = 'RELIABILITY_OPTIMIZED'
+
+
+class DatabricksSQLEndpointChannelName(Enum):
+    """
+    Channel Name indicates the kind of channel to use, either the preview channel and make use of  upcoming functionality or
+    set to the current channel
+    .. see also:: https://docs.databricks.com/sql/api/sql-endpoints.html#channel
+    """
+    CHANNEL_NAME_PREVIEW = 'CHANNEL_NAME_PREVIEW'
+    CHANNEL_NAME_CURRENT = 'CHANNEL_NAME_CURRENT'
+
+
+class DatabricksCreateSqlEndpointOperator(BaseOperator):
+    # Used in airflow.models.BaseOperator
+    template_fields: Sequence[str] = ('json',)
+    # Databricks brand color (blue) under white text
+    ui_color = '#1CB1C2'
+    ui_fgcolor = '#fff'
+
+    def __init__(
+        self,
+        *,
+        json: Optional[Any] = None,
+        name: str = 'My SQL Endpoint',
+        cluster_size: DatabricksSQLEndpointClusterSize,
+        min_num_clusters: int = 1,
+        max_num_clusters: int = 1,
+        auto_stop_mins: int = 0,
+        tags: Optional[Dict[str, str]] = None,
+        spot_instance_policy: Optional[DatabricksSQLEndpointSpotInstancePolicy] = None,
+        enable_photon: bool = True,
+        enable_serverless_compute: bool = False,
+        channel: Optional[DatabricksSQLEndpointChannelName] = None,
+        databricks_conn_id: str = 'databricks_default',
+        databricks_retry_limit: int = 3,
+        databricks_retry_delay: int = 1,
+        **kwargs,
+    ) -> None:
+        """Creates a new ``DatabricksCreateSqlEndpointOperator``."""
+        super().__init__(**kwargs)
+        self.json = json or {}
+        self.databricks_conn_id = databricks_conn_id
+        self.databricks_retry_limit = databricks_retry_limit
+        self.databricks_retry_delay = databricks_retry_delay
+
+        if name is not None:
+            self.json['name'] = name
+        if cluster_size is not None:
+            self.json['cluster_size'] = cluster_size
+        if min_num_clusters is not None:
+            self.json['min_num_clusters'] = min_num_clusters
+        if max_num_clusters is not None:
+            self.json['max_num_clusters'] = max_num_clusters
+        if auto_stop_mins is not None:
+            self.json['auto_stop_mins'] = auto_stop_mins
+        if tags is not None:
+            self.json['tags'] = tags
+        if spot_instance_policy is not None:
+            self.json['spot_instance_policy'] = spot_instance_policy
+        if enable_photon is not None:
+            self.json['enable_photon'] = enable_photon
+        if enable_serverless_compute is not None:
+            self.json['enable_serverless_compute'] = enable_serverless_compute
+        if channel is not None:
+            self.json['channel'] = channel
+
+        self.json = _deep_string_coerce(self.json)
+        self.sql_endpoint_id: Optional[str] = None
+
+    def _get_hook(self) -> DatabricksHook:
+        return DatabricksHook(
+            self.databricks_conn_id,
+            retry_limit=self.databricks_retry_limit,
+            retry_delay=self.databricks_retry_delay,
+        )
+
+    def execute(self, context: 'Context'):
+        hook = self._get_hook()
+        self.sql_endpoint_id = hook.create_sql_endpoint(self.json)
+        return self.sql_endpoint_id

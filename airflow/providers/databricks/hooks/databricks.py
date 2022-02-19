@@ -57,6 +57,10 @@ UNINSTALL_LIBS_ENDPOINT = ('POST', 'api/2.0/libraries/uninstall')
 USER_AGENT_HEADER = {'user-agent': f'airflow-{__version__}'}
 
 RUN_LIFE_CYCLE_STATES = ['PENDING', 'RUNNING', 'TERMINATING', 'TERMINATED', 'SKIPPED', 'INTERNAL_ERROR']
+SQL_ENDPOINT_LIFE_CYCLE_STATES = ['STARTING', 'RUNNING', 'STOPPING', 'STOPPED', 'DELETING', 'DELETED']
+
+CREATE_SQL_ENDPOINT = ("POST", "api/2.0/sql/endpoints/create")
+GET_SQL_ENDPOINT_STATE = ("GET", "api/2.0/sql/endpoints/{}")
 
 # https://docs.microsoft.com/en-us/azure/databricks/dev-tools/api/latest/aad/service-prin-aad-token#--get-an-azure-active-directory-access-token
 # https://docs.microsoft.com/en-us/graph/deployments#app-registration-and-token-service-root-endpoints
@@ -101,6 +105,44 @@ class RunState:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, RunState):
+            return NotImplemented
+        return (
+            self.life_cycle_state == other.life_cycle_state
+            and self.result_state == other.result_state
+            and self.state_message == other.state_message
+        )
+
+    def __repr__(self) -> str:
+        return str(self.__dict__)
+
+
+class SQLEndpointState:
+    """Utility class to represent the state of a SQL Endpoint"""
+
+    def __init__(
+        self, life_cycle_state: str, result_state: str = '', state_message: str = '', *args, **kwargs
+    ) -> None:
+        self.life_cycle_state = life_cycle_state
+        self.result_state = result_state
+        self.state_message = state_message
+
+    @property
+    def is_running_successful(self) -> bool:
+        """True if the result state is RUNNING"""
+        return self.result_state in ['RUNNING']
+
+    @property
+    def is_stopped_successful(self) -> bool:
+        """True if the result state is STOPPED"""
+        return self.result_state in ['STOPPED']
+
+    @property
+    def is_deleted_successful(self) -> bool:
+        """True if the result state is DELETED"""
+        return self.result_state in ['DELETED']
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SQLEndpointState):
             return NotImplemented
         return (
             self.life_cycle_state == other.life_cycle_state
@@ -534,6 +576,35 @@ class DatabricksHook(BaseHook):
         :param json: json dictionary containing cluster_id and an array of library
         """
         self._do_api_call(UNINSTALL_LIBS_ENDPOINT, json)
+
+    def create_sql_endpoint(self, json: dict) -> str:
+        """
+        Create a SQL Endpoint
+
+        :param json: json dictionary containing SQL Endpoint specification.
+        """
+        response = self._do_api_call(CREATE_SQL_ENDPOINT, json)
+        return response['id']
+
+    def get_sql_endpoint_state(self, sql_end_point_id: str) -> SQLEndpointState:
+        """
+        Gets the state of the SQL Endpoint.
+
+        Please note that any Airflow tasks that call the ``get_run_state`` method will result in
+        failure unless you have enabled xcom pickling.  This can be done using the following
+        environment variable: ``AIRFLOW__CORE__ENABLE_XCOM_PICKLING``
+
+        If you do not want to enable xcom pickling, use the ``get_run_state_str`` method to get
+        a string describing state, or ``get_run_state_lifecycle``, ``get_run_state_result``, or
+        ``get_run_state_message`` to get individual components of the run state.
+
+        :param run_id: id of the run
+        :return: state of the run
+        """
+
+        response = self._do_api_call(GET_SQL_ENDPOINT_STATE, None)
+        state = response['state']
+        return SQLEndpointState(**state)
 
 
 def _retryable_error(exception) -> bool:
