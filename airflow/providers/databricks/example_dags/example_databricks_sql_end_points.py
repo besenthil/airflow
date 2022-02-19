@@ -47,3 +47,4 @@ with DAG(
     databricks_connection = os.environ["AIRFLOW_CONN_DATABRICKS_DEFAULT"]
     task = DatabricksGetSqlEndpointOperator(databricks_conn_id=databricks_connection,
                                             task_id='get_sql_end_points',)
+    print(task)
