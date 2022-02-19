@@ -59,7 +59,7 @@ USER_AGENT_HEADER = {'user-agent': f'airflow-{__version__}'}
 RUN_LIFE_CYCLE_STATES = ['PENDING', 'RUNNING', 'TERMINATING', 'TERMINATED', 'SKIPPED', 'INTERNAL_ERROR']
 SQL_ENDPOINT_LIFE_CYCLE_STATES = ['STARTING', 'RUNNING', 'STOPPING', 'STOPPED', 'DELETING', 'DELETED']
 
-CREATE_SQL_ENDPOINT = ("POST", "api/2.0/sql/endpoints/create")
+CREATE_SQL_ENDPOINT = ("POST", "api/2.0/sql/endpoints")
 GET_SQL_ENDPOINTS = ("GET", "api/2.0/sql/endpoints")
 GET_SQL_ENDPOINT_STATE = ("GET", "api/2.0/sql/endpoints/{}")
 
