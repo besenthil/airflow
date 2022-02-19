@@ -34,7 +34,7 @@ https://docs.databricks.com/api/latest/jobs.html#runstate
 from datetime import datetime
 
 from airflow import DAG
-from airflow.providers.databricks.operators.databricks import DatabricksGetSqlEndpointOperator
+from airflow.providers.databricks.operators.databricks import DatabricksGetSqlEndpointsOperator
 
 with DAG(
     dag_id='example_databricks_endpoint_operator',
@@ -45,5 +45,5 @@ with DAG(
 ) as dag:
     import os
     # databricks_connection = os.environ["AIRFLOW_CONN_DATABRICKS_DEFAULT"]
-    task = DatabricksGetSqlEndpointOperator(task_id='get_sql_end_points',)
+    task = DatabricksGetSqlEndpointsOperator(task_id='get_sql_end_points',)
     print(task.execute())

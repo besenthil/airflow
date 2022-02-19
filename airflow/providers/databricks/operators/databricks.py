@@ -656,7 +656,7 @@ class DatabricksCreateSqlEndpointOperator(BaseOperator):
         return self.sql_endpoint_id
 
 
-class DatabricksGetSqlEndpointOperator(BaseOperator):
+class DatabricksGetSqlEndpointsOperator(BaseOperator):
     # Used in airflow.models.BaseOperator
     template_fields: Sequence[str] = ('json',)
     # Databricks brand color (blue) under white text
